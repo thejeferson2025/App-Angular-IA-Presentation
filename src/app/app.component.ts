@@ -1,18 +1,20 @@
-import { Component, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FacturaService } from './services/factura';
-import { Factura } from './models/factura.model';
+import * as XLSX from 'xlsx'; 
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { Factura } from './models/factura.model';
+import { FacturaService } from './services/factura';
+import { Component, OnInit, signal } from '@angular/core';
+
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './app.html',
-  styleUrl: './app.css'
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit {
-  title = signal('Procesador de Facturas IA');
+  title = signal('Procesador de Facturas con IA');
   facturas = signal<Factura[]>([]);
   cargando = signal(false);
 
@@ -37,7 +39,7 @@ export class AppComponent implements OnInit {
           this.cargarFacturas(); 
           this.cargando.set(false);
           alert('Factura procesada con éxito');
-          location.reload();
+          location.reload(); 
         },
         error: (err) => {
           console.error(err);
@@ -49,6 +51,7 @@ export class AppComponent implements OnInit {
   }
 
   eliminarFactura(id: number) {
+
     if (confirm('¿Seguro que deseas eliminar esta factura?')) {
       this.facturaService.eliminar(id).subscribe(() => {
         this.cargarFacturas();
@@ -57,10 +60,41 @@ export class AppComponent implements OnInit {
   }
 
   guardarCambios(f: Factura) {
+
     this.facturaService.actualizar(f.id, f).subscribe(() => {
       f.editando = false;
       this.cargarFacturas();
     });
   }
 
+  generarExcel() {
+    // Verificamos de datos
+    if (this.facturas().length === 0) {
+      alert("No hay datos para exportar");
+      return;
+    }
+
+    // A. Preparamos los datos 
+    const datosParaExcel = this.facturas().map(f => ({
+      'ID': f.id,
+      'Emisor': f.emisor,
+      'NIT/RUC': f.nitOId,
+      'Fecha': new Date(f.fecha).toLocaleDateString(), 
+      'Total': f.totalPagar,
+      'Moneda': f.moneda
+    }));
+
+    // B. Creamos la hoja de cálculo
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(datosParaExcel);
+
+    // C. Creamos el libro de trabajo
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Facturas');
+
+    // D. Guardamos el archivo
+    const nombreArchivo = `Reporte_Facturas_${new Date().toISOString().slice(0,10)}.xlsx`;
+    XLSX.writeFile(wb, nombreArchivo);
+  }
+
 }
+

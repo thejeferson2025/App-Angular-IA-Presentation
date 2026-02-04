@@ -1,0 +1,272 @@
+/* --- 1. CONFIGURACIÓN GLOBAL --- */
+:host {
+  display: block;
+  background-color: #f1f5f9; /* Color de fondo gris suave para toda la pantalla */
+  min-height: 100vh;
+  padding-top: 20px;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 30px auto;
+  padding: 40px;
+  background: #ffffff;
+  border-radius: 20px; /* Bordes más redondeados */
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); /* Sombra difusa moderna */
+  font-family: 'Inter', 'Segoe UI', Roboto, sans-serif; /* Fuente más moderna si está disponible */
+  color: #1e293b;
+}
+
+/* --- 2. HEADER MODERNO --- */
+.header {
+  margin-bottom: 40px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 20px;
+}
+
+.header h1 {
+  background: linear-gradient(135deg, #0f172a 0%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 2.25rem; /* 36px */
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  margin: 0;
+}
+
+.header p {
+  color: #64748b;
+  font-size: 0.95rem;
+  margin-top: 8px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* --- 3. ZONA DE CARGA (UPLOAD) --- */
+.upload-card {
+  background-color: #f8fafc;
+  /* Mantenemos el mismo borde punteado bonito */
+  background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='15' ry='15' stroke='%233B82F6' stroke-width='2' stroke-dasharray='12%2c 12' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+  border-radius: 15px;
+  
+  /* CAMBIOS AQUÍ: Reducimos el padding vertical drásticamente */
+  padding: 20px;       /* Antes era 50px 20px */
+  margin-bottom: 25px; /* Antes era 40px, lo acercamos un poco más a la tabla */
+  
+  text-align: center;
+  transition: all 0.3s ease;
+  border: none;
+  position: relative;
+  cursor: pointer;
+  
+  /* Opcional: Centrar contenido verticalmente usando Flexbox para que se vea alineado */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px; /* Espacio entre el texto y el botón de elegir archivo */
+}
+
+/* Ajuste adicional para el título dentro de la tarjeta */
+.upload-card h3 {
+  margin: 0; /* Quitamos márgenes extraños */
+  font-size: 1rem; /* Un poco más pequeño también */
+}
+
+/* Ajuste para el input */
+.upload-card input[type="file"] {
+  margin-top: 5px; /* Menos espacio arriba del input */
+  padding: 6px 10px; /* Input un poco más sutil */
+}
+
+/* Estilizar el input file para que se vea mejor alineado */
+.upload-card input[type="file"] {
+  margin-top: 15px;
+  padding: 10px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  font-size: 0.9rem;
+}
+
+/* Spinner de carga */
+.spinner {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+
+/* --- 4. CONTROLES SUPERIORES (Botón Excel) --- */
+/* Agregamos un contenedor flex para el botón de Excel si no lo tienes */
+.controls-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+}
+
+.btn-excel {
+  background: linear-gradient(to bottom, #107c41, #0c5e31);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 4px 6px -1px rgba(16, 124, 65, 0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-excel:hover {
+  background: linear-gradient(to bottom, #158f4a, #0f6b39);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 10px -2px rgba(16, 124, 65, 0.3);
+}
+
+.btn-excel:disabled {
+  background: #cbd5e1;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* --- 5. TABLA ESTILIZADA --- */
+.table-responsive {
+  border-radius: 12px;
+  overflow: hidden; /* Para recortar las esquinas */
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e2e8f0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+thead th {
+  background-color: #f1f5f9;
+  color: #475569;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  padding: 16px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+tbody tr {
+  transition: background-color 0.2s;
+}
+
+tbody tr:hover {
+  background-color: #f8fafc; /* Hover sutil en filas */
+}
+
+td {
+  padding: 16px;
+  border-bottom: 1px solid #e2e8f0;
+  color: #334155;
+  font-size: 0.95rem;
+  vertical-align: middle;
+}
+
+/* Badge de Moneda */
+.currency-badge {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: inline-block;
+}
+
+/* --- 6. INPUTS DE EDICIÓN --- */
+.edit-input, .edit-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.edit-input:focus, .edit-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* --- 7. BOTONES DE ACCIÓN --- */
+.actions-cell {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Base button styles */
+.btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+}
+
+/* Editar */
+.btn-edit {
+  background-color: white;
+  border-color: #dbeafe;
+  color: #2563eb;
+}
+.btn-edit:hover {
+  background-color: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+}
+
+/* Eliminar */
+.btn-delete {
+  background-color: white;
+  border-color: #ffe4e6;
+  color: #e11d48;
+}
+.btn-delete:hover {
+  background-color: #fff1f2;
+  border-color: #fecdd3;
+  color: #be123c;
+}
+
+/* Guardar */
+.btn-save {
+  background-color: #10b981;
+  color: white;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.btn-save:hover { background-color: #059669; }
+
+/* Cancelar */
+.btn-cancel {
+  background-color: #94a3b8;
+  color: white;
+  padding: 8px; /* Circular o cuadrado pequeño */
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+}
+.btn-cancel:hover { background-color: #64748b; }

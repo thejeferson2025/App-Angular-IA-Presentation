@@ -1,15 +1,21 @@
 <div class="container">
   <div class="header">
     <h1>{{ title() }}</h1>
-    <p>Analizador de comprobantes electrónicos</p>
+    <p>Analiza comprobantes electrónicos</p>
   </div>
 
   <div class="upload-card">
     <h3>📤 Subir Comprobante (PDF)</h3>
     <input type="file" (change)="onFileSelected($event)" accept=".pdf" [disabled]="cargando()">
     <div *ngIf="cargando()" style="margin-top: 15px; color: #3b82f6; font-weight: 500;">
-        <span class="spinner">⚙️</span> Extrayendo datos con IA... por favor espera.
+        <span class="spinner">⚙️</span>Procesando con IA..
     </div>
+  </div>
+
+  <div style="display: flex; justify-content: flex-end; margin: 20px 0;">
+    <button class="btn-excel" (click)="generarExcel()">
+      📊 Descargar Excel
+    </button>
   </div>
 
   <div class="table-responsive">
