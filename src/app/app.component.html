@@ -7,8 +7,10 @@
   <div class="upload-card">
     <h3>📤 Subir Comprobante (PDF)</h3>
     <input type="file" (change)="onFileSelected($event)" accept=".pdf" [disabled]="cargando()">
-    <div *ngIf="cargando()" style="margin-top: 15px; color: #3b82f6; font-weight: 500;">
-        <span class="spinner">⚙️</span>Procesando con IA..
+
+    <div *ngIf="cargando()" class="loading-state">
+      <div class="spinner-modern"></div>
+      <p class="loading-text">🤖 La IA está analizando tu comprobante...</p>
     </div>
   </div>
 
@@ -26,10 +28,17 @@
           <th>RUC / NIT</th>
           <th>Fecha</th>
           <th>Total</th>
-          <th>Moneda</th> <th>Acciones</th>
+          <th>Moneda</th>
+          <th style="text-align: center;">Acciones</th>
         </tr>
       </thead>
       <tbody>
+        <tr *ngIf="facturas().length === 0">
+          <td colspan="6" style="text-align: center; padding: 30px; color: #6c757d; font-style: italic;">
+            No hay facturas procesadas. Sube un comprobante en PDF para comenzar.
+          </td>
+        </tr>
+
         <tr *ngFor="let f of facturas()">
           <ng-container *ngIf="!f.editando">
             <td>{{ f.emisor }}</td>
@@ -37,9 +46,9 @@
             <td>{{ f.fecha | date:'dd/MM/yyyy' }}</td>
             <td style="font-weight: bold;">{{ f.totalPagar | number:'1.2-2' }}</td>
             <td><span class="currency-badge">{{ f.moneda }}</span></td>
-            <td class="actions-cell">
-              <button class="btn btn-edit" (click)="f.editando = true">Editar</button>
-              <button class="btn btn-delete" (click)="eliminarFactura(f.id)">Eliminar</button>
+            <td class="actions-cell" style="text-align: center; gap: 8px; display: flex; justify-content: center;">
+              <button class="btn btn-edit" title="Editar" (click)="f.editando = true">✏️</button>
+              <button class="btn btn-delete" title="Eliminar" (click)="eliminarFactura(f.id)">🗑️</button>
             </td>
           </ng-container>
 
@@ -56,9 +65,9 @@
                 <option value="MXN">MXN</option>
               </select>
             </td>
-            <td class="actions-cell">
-              <button class="btn btn-save" (click)="guardarCambios(f)">Guardar</button>
-              <button class="btn btn-cancel btn-small" (click)="f.editando = false">X</button>
+            <td class="actions-cell" style="text-align: center; gap: 8px; display: flex; justify-content: center;">
+              <button class="btn btn-save" title="Guardar Cambios" (click)="guardarCambios(f)">💾</button>
+              <button class="btn btn-cancel btn-small" title="Cancelar Edición" (click)="f.editando = false">❌</button>
             </td>
           </ng-container>
         </tr>

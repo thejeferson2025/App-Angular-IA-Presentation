@@ -1,10 +1,10 @@
-import * as XLSX from 'xlsx'; 
+import * as XLSX from 'xlsx';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Factura } from './models/factura.model';
 import { FacturaService } from './services/factura';
 import { Component, OnInit, signal } from '@angular/core';
-
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-root',
@@ -36,15 +36,30 @@ export class AppComponent implements OnInit {
       this.cargando.set(true);
       this.facturaService.subirPdf(file).subscribe({
         next: () => {
-          this.cargarFacturas(); 
+          this.cargarFacturas();
           this.cargando.set(false);
-          alert('Factura procesada con éxito');
-          location.reload(); 
+
+          Swal.fire({
+            position: 'top-end',
+            icon: 'success',
+            title: 'Factura procesada con éxito',
+            showConfirmButton: false,
+            timer: 2500,
+            toast: true
+          });
+
+
         },
         error: (err) => {
           console.error(err);
           this.cargando.set(false);
-          alert('Error al procesar el PDF');
+
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Error al procesar el PDF',
+            confirmButtonColor: '#0d6efd'
+          });
         }
       });
     }
@@ -52,15 +67,32 @@ export class AppComponent implements OnInit {
 
   eliminarFactura(id: number) {
 
-    if (confirm('¿Seguro que deseas eliminar esta factura?')) {
-      this.facturaService.eliminar(id).subscribe(() => {
-        this.cargarFacturas();
-      });
-    }
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: "Esta acción eliminará la factura permanentemente.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.facturaService.eliminar(id).subscribe(() => {
+          this.cargarFacturas();
+
+
+          Swal.fire(
+            '¡Eliminada!',
+            'La factura ha sido borrada.',
+            'success'
+          );
+        });
+      }
+    });
   }
 
   guardarCambios(f: Factura) {
-
     this.facturaService.actualizar(f.id, f).subscribe(() => {
       f.editando = false;
       this.cargarFacturas();
@@ -68,33 +100,36 @@ export class AppComponent implements OnInit {
   }
 
   generarExcel() {
-    // Verificamos de datos
+
     if (this.facturas().length === 0) {
-      alert("No hay datos para exportar");
+      Swal.fire({
+        icon: 'info',
+        title: 'Sin datos',
+        text: 'No hay facturas para exportar a Excel.',
+        confirmButtonColor: '#0d6efd'
+      });
       return;
     }
 
-    // A. Preparamos los datos 
+
     const datosParaExcel = this.facturas().map(f => ({
       'ID': f.id,
       'Emisor': f.emisor,
-      'NIT/RUC': f.nitOId,
-      'Fecha': new Date(f.fecha).toLocaleDateString(), 
+      'RUC': f.nitOId,
+      'Fecha': new Date(f.fecha).toLocaleDateString(),
       'Total': f.totalPagar,
       'Moneda': f.moneda
     }));
 
-    // B. Creamos la hoja de cálculo
+
     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(datosParaExcel);
 
-    // C. Creamos el libro de trabajo
+
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Facturas');
 
-    // D. Guardamos el archivo
+
     const nombreArchivo = `Reporte_Facturas_${new Date().toISOString().slice(0,10)}.xlsx`;
     XLSX.writeFile(wb, nombreArchivo);
   }
-
 }
-
