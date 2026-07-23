@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Factura } from './models/factura.model';
 import { FacturaService } from './services/factura';
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, ViewChild, ElementRef } from '@angular/core';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -17,6 +17,7 @@ export class AppComponent implements OnInit {
   title = signal('Procesador de Facturas con IA');
   facturas = signal<Factura[]>([]);
   cargando = signal(false);
+  @ViewChild('fileUpload') fileUploadRef!: ElementRef;
 
   constructor(private facturaService: FacturaService) {}
 
@@ -37,7 +38,7 @@ export class AppComponent implements OnInit {
       this.facturaService.subirPdf(file).subscribe({
         next: () => {
           this.cargarFacturas();
-          this.cargando.set(false);
+          this.finalizarCarga();
 
           Swal.fire({
             position: 'top-end',
@@ -52,7 +53,7 @@ export class AppComponent implements OnInit {
         },
         error: (err) => {
           console.error(err);
-          this.cargando.set(false);
+          this.finalizarCarga();
 
           Swal.fire({
             icon: 'error',
@@ -65,8 +66,14 @@ export class AppComponent implements OnInit {
     }
   }
 
-  eliminarFactura(id: number) {
+  finalizarCarga() {
+    this.cargando.set(false);
+    if (this.fileUploadRef) {
+      this.fileUploadRef.nativeElement.value = '';
+    }
+  }
 
+  eliminarFactura(id: number) {
     Swal.fire({
       title: '¿Estás seguro?',
       text: "Esta acción eliminará la factura permanentemente.",
@@ -82,11 +89,14 @@ export class AppComponent implements OnInit {
           this.cargarFacturas();
 
 
-          Swal.fire(
-            '¡Eliminada!',
-            'La factura ha sido borrada.',
-            'success'
-          );
+         Swal.fire({
+            position: 'top-end',
+            icon: 'success',
+            title: 'Factura Eliminada',
+            showConfirmButton: false,
+            timer: 2500,
+            toast: true
+          });
         });
       }
     });
@@ -96,11 +106,18 @@ export class AppComponent implements OnInit {
     this.facturaService.actualizar(f.id, f).subscribe(() => {
       f.editando = false;
       this.cargarFacturas();
+      Swal.fire({
+        position: 'top-end',
+        icon: 'success',
+        title: 'Cambios guardados',
+        showConfirmButton: false,
+        timer: 2500,
+        toast: true
+      });
     });
   }
 
   generarExcel() {
-
     if (this.facturas().length === 0) {
       Swal.fire({
         icon: 'info',
@@ -111,9 +128,9 @@ export class AppComponent implements OnInit {
       return;
     }
 
-
-    const datosParaExcel = this.facturas().map(f => ({
-      'ID': f.id,
+    const datosParaExcel = this.facturas().map((f, index) => ({
+      'N°': index + 1,
+      'ID Base Datos': f.id,
       'Emisor': f.emisor,
       'RUC': f.nitOId,
       'Fecha': new Date(f.fecha).toLocaleDateString(),
@@ -121,13 +138,10 @@ export class AppComponent implements OnInit {
       'Moneda': f.moneda
     }));
 
-
     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(datosParaExcel);
-
-
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Facturas');
 
+    XLSX.utils.book_append_sheet(wb, ws, 'Facturas');
 
     const nombreArchivo = `Reporte_Facturas_${new Date().toISOString().slice(0,10)}.xlsx`;
     XLSX.writeFile(wb, nombreArchivo);

@@ -6,12 +6,8 @@
 
   <div class="upload-card">
     <h3>📤 Subir Comprobante (PDF)</h3>
-    <input type="file" (change)="onFileSelected($event)" accept=".pdf" [disabled]="cargando()">
+    <input type="file" #fileUpload (change)="onFileSelected($event)" accept=".pdf" [disabled]="cargando()">
 
-    <div *ngIf="cargando()" class="loading-state">
-      <div class="spinner-modern"></div>
-      <p class="loading-text">🤖 La IA está analizando tu comprobante...</p>
-    </div>
   </div>
 
   <div style="display: flex; justify-content: flex-end; margin: 20px 0;">
@@ -24,8 +20,9 @@
     <table>
       <thead>
         <tr>
+          <th style="width: 40px; text-align: center;">#</th>
           <th>Emisor</th>
-          <th>RUC / NIT</th>
+          <th>RUC</th>
           <th>Fecha</th>
           <th>Total</th>
           <th>Moneda</th>
@@ -34,13 +31,15 @@
       </thead>
       <tbody>
         <tr *ngIf="facturas().length === 0">
-          <td colspan="6" style="text-align: center; padding: 30px; color: #6c757d; font-style: italic;">
-            No hay facturas procesadas. Sube un comprobante en PDF para comenzar.
+          <td colspan="7" style="text-align: center; padding: 30px; color: #6c757d; font-style: italic;">
+            No hay facturas procesadas, Sube un comprobante en PDF
           </td>
         </tr>
 
-        <tr *ngFor="let f of facturas()">
+        <tr *ngFor="let f of facturas(); let i = index">
+
           <ng-container *ngIf="!f.editando">
+            <td style="text-align: center; font-weight: bold; color: #64748b;">{{ i + 1 }}</td>
             <td>{{ f.emisor }}</td>
             <td>{{ f.nitOId }}</td>
             <td>{{ f.fecha | date:'dd/MM/yyyy' }}</td>
@@ -53,6 +52,7 @@
           </ng-container>
 
           <ng-container *ngIf="f.editando">
+            <td style="text-align: center; font-weight: bold; color: #64748b;">{{ i + 1 }}</td>
             <td><input class="edit-input" [(ngModel)]="f.emisor"></td>
             <td><input class="edit-input" [(ngModel)]="f.nitOId"></td>
             <td><input class="edit-input" type="date" [ngModel]="f.fecha | date:'yyyy-MM-dd'" (ngModelChange)="f.fecha=$event"></td>
@@ -73,5 +73,15 @@
         </tr>
       </tbody>
     </table>
+  </div>
+
+</div>
+
+
+<div class="overlay-bloqueante" *ngIf="cargando()">
+  <div class="modal-carga">
+    <div class="spinner-modern"></div>
+    <p class="loading-text">🤖 IA PROCESANDO</p>
+    <small class="loading-subtext">Por favor, no cierres ni recargues esta ventana.</small>
   </div>
 </div>
