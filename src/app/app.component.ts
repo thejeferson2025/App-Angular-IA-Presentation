@@ -140,10 +140,12 @@ export class AppComponent implements OnInit {
 
     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(datosParaExcel);
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
-
     XLSX.utils.book_append_sheet(wb, ws, 'Facturas');
-
-    const nombreArchivo = `Reporte_Facturas_${new Date().toISOString().slice(0,10)}.xlsx`;
+    const hoy = new Date();
+    const anio = hoy.getFullYear();
+    const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoy.getDate()).padStart(2, '0');
+    const nombreArchivo = `Reporte_Facturas_${anio}-${mes}-${dia}.xlsx`;
     XLSX.writeFile(wb, nombreArchivo);
   }
 }
